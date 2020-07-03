@@ -316,8 +316,8 @@ int procMaxGameCoilNum(void)
 		int coilNum;
 		const YAML::Node& coils = yamlDoc[kCoilsSection];
 
-		for (YAML::Iterator coilsIt = coils.begin(); coilsIt != coils.end(); ++coilsIt) {
-			coilsIt.second()[kNumberField] >> numStr;
+		for (YAML::const_iterator coilsIt = coils.begin(); coilsIt != coils.end(); ++coilsIt) {
+			numStr = coilsIt->second[kNumberField].as<std::string>();
 			if (numStr.c_str()[0] == 'C') {
 				coilNum = atoi(&numStr.c_str()[1]);
 				if (coilNum > maxCoilNum) {
@@ -337,30 +337,29 @@ void procConfigureDriverDefaults(void)
 		std::string numStr;
 		const YAML::Node& coils = yamlDoc[kCoilsSection];
 
-		for (YAML::Iterator coilsIt = coils.begin(); coilsIt != coils.end(); ++coilsIt) {
-			std::string coilName;
-			coilsIt.first() >> coilName;
+		for (YAML::const_iterator coilsIt = coils.begin(); coilsIt != coils.end(); ++coilsIt) {
+			std::string coilName = coilsIt->first.as<std::string>();
 			int coilNum, pulseTime, patterOnTime, patterOffTime;
 
-			yamlDoc[kCoilsSection][coilName][kNumberField] >> numStr; coilNum = PRDecode(machineType, numStr.c_str());
+			numStr = yamlDoc[kCoilsSection][coilName][kNumberField].as<std::string>();
+			coilNum = PRDecode(machineType, numStr.c_str());
 
 			// Look for yaml entries defining coil pulse times.
-			if (yamlDoc[kCoilsSection][coilName].FindValue(kPulseTimeField)) {
-				yamlDoc[kCoilsSection][coilName][kPulseTimeField] >> pulseTime;
+			if (yamlDoc[kCoilsSection][coilName][kPulseTimeField]) {
+				pulseTime = yamlDoc[kCoilsSection][coilName][kPulseTimeField].as<int>();
 				coilDrivers[coilNum].SetPulseTime(pulseTime);
 			}
 
 			// Look for yaml entries defining coil patter times.
-			if (yamlDoc[kCoilsSection][coilName].FindValue(kPatterOnTimeField) &&
-			     yamlDoc[kCoilsSection][coilName].FindValue(kPatterOnTimeField)) {
-				yamlDoc[kCoilsSection][coilName][kPatterOnTimeField] >> patterOnTime;
-				yamlDoc[kCoilsSection][coilName][kPatterOffTimeField] >> patterOffTime;
+			if (yamlDoc[kCoilsSection][coilName][kPatterOnTimeField] &&
+			     yamlDoc[kCoilsSection][coilName][kPatterOffTimeField]) {
+				patterOnTime = yamlDoc[kCoilsSection][coilName][kPatterOnTimeField].as<int>();
+				patterOffTime = yamlDoc[kCoilsSection][coilName][kPatterOffTimeField].as<int>();
 				coilDrivers[coilNum].SetPatterTimes(patterOnTime, patterOffTime);
 				printf("\nSetting patter times for coil %d: On: %d, Off: %d", coilNum, patterOnTime, patterOffTime);
 			}
-			if (yamlDoc[kCoilsSection][coilName].FindValue(kBusField)) {
-				std::string busStr;
-				yamlDoc[kCoilsSection][coilName][kBusField] >> busStr;
+			if (yamlDoc[kCoilsSection][coilName][kBusField]) {
+				std::string busStr = yamlDoc[kCoilsSection][coilName][kBusField].as<std::string>();
 				if (busStr.compare(kAuxPortValue) == 0) {
 					coilDrivers[coilNum].SetPatterDetectionEnable(0);
 				}
@@ -375,15 +374,14 @@ void procConfigureRGBLamps(void)
 {
     std::string numStr;
     const YAML::Node& lamps = yamlDoc[kLampsSection];
-    for (YAML::Iterator lampsIt = lamps.begin(); lampsIt != lamps.end(); ++lampsIt) {
+    for (YAML::const_iterator lampsIt = lamps.begin(); lampsIt != lamps.end(); ++lampsIt) {
         int lampNum;
-        std::string lampName;
-        lampsIt.first() >> lampName;
+        std::string lampName = lampsIt->first.as<std::string>();
         
-        if (yamlDoc[kLampsSection][lampName].FindValue(kLampRGBEquivalentField)) {
-            yamlDoc[kLampsSection][lampName][kNumberField] >> numStr;
+        if (yamlDoc[kLampsSection][lampName][kLampRGBEquivalentField]) {
+            numStr = yamlDoc[kLampsSection][lampName][kNumberField].as<std::string>();
             lampNum = PRDecode(machineType, numStr.c_str());
-            lamp_RGB_Equiv[lampNum] = yamlDoc[kLampsSection][lampName][kLampRGBEquivalentField];
+            lamp_RGB_Equiv[lampNum] = yamlDoc[kLampsSection][lampName][kLampRGBEquivalentField].as<int>();
             printf("\nMapping lamp %s, number : %d to RGB lamp %d",lampName.c_str(),lampNum, lamp_RGB_Equiv[lampNum]);
         }
         
@@ -392,22 +390,21 @@ void procConfigureRGBLamps(void)
 
 void procConfigureFlipperSwitchRules(int enabled)
 {
-	if (yamlDoc.size() > 0 && yamlDoc.FindValue(kFlippersSection)) {
+	if (yamlDoc.size() > 0 && yamlDoc[kFlippersSection]) {
 		// WPC Flippers
 		std::string numStr;
                 const YAML::Node& flippers = yamlDoc[kFlippersSection];
-                for (YAML::Iterator flippersIt = flippers.begin(); flippersIt != flippers.end(); ++flippersIt) {
+                for (YAML::const_iterator flippersIt = flippers.begin(); flippersIt != flippers.end(); ++flippersIt) {
 			int swNum, coilMain, coilHold;
-			std::string flipperName;
-                        *flippersIt >> flipperName;
+			std::string flipperName = (*flippersIt).as<std::string>();
 			if (machineType == kPRMachineWPC || machineType == kPRMachineWPC95) {
-				yamlDoc[kSwitchesSection][flipperName][kNumberField] >> numStr;
+				numStr = yamlDoc[kSwitchesSection][flipperName][kNumberField].as<std::string>();
 				swNum = PRDecode(machineType, numStr.c_str());
 
-				yamlDoc[kCoilsSection][flipperName + "Main"][kNumberField] >> numStr;
+				numStr = yamlDoc[kCoilsSection][flipperName + "Main"][kNumberField].as<std::string>();
 				coilMain = PRDecode(machineType, numStr.c_str());
 
-				yamlDoc[kCoilsSection][flipperName + "Hold"][kNumberField] >> numStr;
+				numStr = yamlDoc[kCoilsSection][flipperName + "Hold"][kNumberField].as<std::string>();
 				coilHold = PRDecode(machineType, numStr.c_str());
 
 				if (enabled) {
@@ -421,10 +418,10 @@ void procConfigureFlipperSwitchRules(int enabled)
 				AddIgnoreCoil(coilMain);
 				AddIgnoreCoil(coilHold);
 			} else if (machineType == kPRMachineSternWhitestar || machineType == kPRMachineSternSAM) {
-				yamlDoc[kSwitchesSection][flipperName][kNumberField] >> numStr;
+				numStr = yamlDoc[kSwitchesSection][flipperName][kNumberField].as<std::string>();
 				swNum = PRDecode(machineType, numStr.c_str());
 
-				yamlDoc[kCoilsSection][flipperName + "Main"][kNumberField] >> numStr;
+				numStr = yamlDoc[kCoilsSection][flipperName + "Main"][kNumberField].as<std::string>();
 				coilMain = PRDecode(machineType, numStr.c_str());
 
 				ConfigureSternFlipperSwitchRule(swNum, coilMain, kFlipperPulseTime, kFlipperPatterOnTime, kFlipperPatterOffTime);
@@ -469,15 +466,15 @@ void procFullTroughDisablesFlippers(void)
 	std::string switchName, numStr;
 
 	// build a list of SXX switch numbers with names starting with "trough" and a digit
-	if (troughCount == -1 && yamlDoc.size() > 0 && yamlDoc.FindValue(kSwitchesSection)) {
+	if (troughCount == -1 && yamlDoc.size() > 0 && yamlDoc[kSwitchesSection]) {
 		troughCount = 0;
 		if (procGetYamlPinmameSettingInt("fullTroughDisablesFlippers", 0)) {
 			const YAML::Node& switches = yamlDoc[kSwitchesSection];
-			for (YAML::Iterator switchesIt = switches.begin(); switchesIt != switches.end(); ++switchesIt) {
-				switchesIt.first() >> switchName;
+			for (YAML::const_iterator switchesIt = switches.begin(); switchesIt != switches.end(); ++switchesIt) {
+				switchName = switchesIt->first.as<std::string>();
 				if (strncmp("trough", switchName.c_str(), 6) == 0
 					&& isdigit(switchName.c_str()[6])) {
-					switchesIt.second()[kNumberField] >> numStr;
+					numStr = switchesIt->second[kNumberField].as<std::string>();
 					if (troughCount == MAX_TROUGH_SWITCHES) {
 						fprintf(stderr, "Too many trough switches defined (max %d)\n",
 							MAX_TROUGH_SWITCHES);
@@ -530,17 +527,15 @@ void procConfigureSwitchRules(int enabled)
 
 	if (yamlDoc.size() > 0) {
                 printf("\n\nProcessing bumper entries");
-                if (yamlDoc.FindValue(kBumpersSection)) {
-                    const YAML::Node& bumpers = yamlDoc[kBumpersSection];
-                    for (YAML::Iterator bumpersIt = bumpers.begin(); bumpersIt != bumpers.end(); ++bumpersIt) {
+                if (const YAML::Node& bumpers = yamlDoc[kBumpersSection]) {
+                    for (YAML::const_iterator bumpersIt = bumpers.begin(); bumpersIt != bumpers.end(); ++bumpersIt) {
                             int swNum, coilNum;
                             // WPC Slingshots
-                            std::string bumperName;
-                            *bumpersIt >> bumperName;
-                            yamlDoc[kSwitchesSection][bumperName][kNumberField] >> numStr;
+                            std::string bumperName = (*bumpersIt).as<std::string>();
+                            numStr = yamlDoc[kSwitchesSection][bumperName][kNumberField].as<std::string>();
                             swNum = PRDecode(machineType, numStr.c_str());
 
-                            yamlDoc[kCoilsSection][bumperName][kNumberField] >> numStr;
+                            numStr = yamlDoc[kCoilsSection][bumperName][kNumberField].as<std::string>();
                             coilNum = PRDecode(machineType, numStr.c_str());
 
                             if (enabled) {
@@ -556,27 +551,25 @@ void procConfigureSwitchRules(int enabled)
 
                 // Process kickback entries, if found
                 printf("\n\nProcessing kickback entries");
-                if (yamlDoc.FindValue(kKickbacksSection)) {
-                    const YAML::Node& kickbacks = yamlDoc[kKickbacksSection];
-                    for (YAML::Iterator kickbacksIt = kickbacks.begin(); kickbacksIt != kickbacks.end(); ++kickbacksIt) {
+                if (const YAML::Node& kickbacks = yamlDoc[kKickbacksSection]) {
+                    for (YAML::const_iterator kickbacksIt = kickbacks.begin(); kickbacksIt != kickbacks.end(); ++kickbacksIt) {
                         int swNum=0, coilNum=0, lampNum=0, delayOnTime=kKickbackDelayOnTime, delayOffTime=kKickbackDelayOffTime;
-                        std::string kickbackName;
-                        kickbacksIt.first() >> kickbackName;
+                        std::string kickbackName = kickbacksIt->first.as<std::string>();
 
 
                         // Look for yaml entries defining delay times.
 
-                        if (yamlDoc[kKickbacksSection][kickbackName].FindValue(kKickbackDelayOnField)) {
-                            yamlDoc[kKickbacksSection][kickbackName][kKickbackDelayOnField] >> delayOnTime;
+                        if (yamlDoc[kKickbacksSection][kickbackName][kKickbackDelayOnField]) {
+                            delayOnTime = yamlDoc[kKickbacksSection][kickbackName][kKickbackDelayOnField].as<int>();
                         }
-                        if (yamlDoc[kKickbacksSection][kickbackName].FindValue(kKickbackDelayOffField)) {
-                            yamlDoc[kKickbacksSection][kickbackName][kKickbackDelayOffField] >> delayOffTime;
+                        if (yamlDoc[kKickbacksSection][kickbackName][kKickbackDelayOffField]) {
+                            delayOffTime = yamlDoc[kKickbacksSection][kickbackName][kKickbackDelayOffField].as<int>();
                         }
-                        yamlDoc[kSwitchesSection][kickbackName][kNumberField] >> numStr;
+                        numStr = yamlDoc[kSwitchesSection][kickbackName][kNumberField].as<std::string>();
                         swNum = PRDecode(machineType, numStr.c_str());
-                        yamlDoc[kCoilsSection][kickbackName][kNumberField] >> numStr;
+                        numStr = yamlDoc[kCoilsSection][kickbackName][kNumberField].as<std::string>();
                         coilNum = PRDecode(machineType, numStr.c_str());
-                        yamlDoc[kLampsSection][kickbackName][kNumberField] >> numStr;
+                        numStr = yamlDoc[kLampsSection][kickbackName][kNumberField].as<std::string>();
                         lampNum = PRDecode(machineType, numStr.c_str());
 
                         coreGlobals.isKickbackLamp[lampNum] = enabled;
@@ -661,18 +654,18 @@ void procConfigureInputMap(void)
     printf ("\n\nProcessing control switches");
 	if (yamlDoc.size() > 0) {
                 std::string numStr;
-                if (yamlDoc[kSwitchesSection].FindValue("flipperLwL")) {
-                    yamlDoc[kSwitchesSection]["flipperLwL"][kNumberField] >> numStr;
+                if (yamlDoc[kSwitchesSection]["flipperLwL"]) {
+                    numStr = yamlDoc[kSwitchesSection]["flipperLwL"][kNumberField].as<std::string>();
                     swMap[kFlipperLwL] = PRDecode(machineType, numStr.c_str());
                     printf("\n- FlipperLwL: %d", swMap[kFlipperLwL]);
                 }
-                if (yamlDoc[kSwitchesSection].FindValue("flipperLwR")) {
-                    yamlDoc[kSwitchesSection]["flipperLwR"][kNumberField] >> numStr;
+                if (yamlDoc[kSwitchesSection]["flipperLwR"]) {
+                    numStr = yamlDoc[kSwitchesSection]["flipperLwR"][kNumberField].as<std::string>();
                     swMap[kFlipperLwR] = PRDecode(machineType, numStr.c_str());
                     printf("\n- FlipperLwR: %d", swMap[kFlipperLwR]);
                 }
-                if (yamlDoc[kSwitchesSection].FindValue("startButton")) {
-                    yamlDoc[kSwitchesSection]["startButton"][kNumberField] >> numStr;
+                if (yamlDoc[kSwitchesSection]["startButton"]) {
+                    numStr = yamlDoc[kSwitchesSection]["startButton"][kNumberField].as<std::string>();
                     swMap[kStartButton] = PRDecode(machineType, numStr.c_str());
                     printf("\n- startButton: %d", swMap[kStartButton]);
                 }

@@ -54,14 +54,9 @@ PRMachineType procLoadMachineYAML(char *filename) {
 			fprintf(stderr, "YAML file not found: %s\n", filename);
 			return kPRMachineInvalid;
 		}
-		YAML::Parser parser(fin);
-
-		while(parser) {
-				parser.GetNextDocument(yamlDoc);
-		}
+		yamlDoc = YAML::Load(fin);
                 
-		std::string machineTypeString;
-		yamlDoc["PRGame"]["machineType"] >> machineTypeString;
+		std::string machineTypeString = yamlDoc["PRGame"]["machineType"].as<std::string>();
 		if (machineTypeString == "wpc") {
 			machineType = kPRMachineWPC;
 			fprintf(stderr, "YAML machine type: kPRMachineWPC\n");
@@ -167,7 +162,7 @@ std::string procGetYamlPinmameSettingString(const char *key, const char *default
     std::string retval;
 
     try {
-       yamlDoc["PRPinmame"][key] >> retval;
+       retval = yamlDoc["PRPinmame"][key].as<std::string>();
     }
     catch (...) {
         retval = defaultValue;
@@ -180,7 +175,7 @@ int procGetYamlPinmameSettingInt(const char *key, int defaultValue) {
     int retval;
 
     try {
-       yamlDoc["PRPinmame"][key] >> retval;
+       retval = yamlDoc["PRPinmame"][key].as<int>();
     }
     catch (...) {
         // Not defined in YAML or not numeric
@@ -204,8 +199,8 @@ int procKeyboardWanted(void) {
 void procCheckQuitMethod(void) {
     std::string exitButtonName, numStr;
     exitButtonName = procGetYamlPinmameSettingString("exitButton", "startButton");
-    if (yamlDoc[kSwitchesSection].FindValue(exitButtonName)) {
-        yamlDoc[kSwitchesSection][exitButtonName][kNumberField] >> numStr;
+    if (yamlDoc[kSwitchesSection][exitButtonName]) {
+        numStr = yamlDoc[kSwitchesSection][exitButtonName][kNumberField].as<std::string>();
         exitButton = PRDecode(machineType, numStr.c_str());
         exitButtonHoldTime = procGetYamlPinmameSettingInt("exitButtonHoldTime", 0);
         if (exitButtonHoldTime > 0)
@@ -228,7 +223,7 @@ void procCheckArduinoRGB(void) {
     std::string port;
 
     try {
-        yamlDoc["PRGame"]["arduino"] >> port;
+        port = yamlDoc["PRGame"]["arduino"].as<std::string>();
     }
     catch (...) {
         port = "none";
