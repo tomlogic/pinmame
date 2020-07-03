@@ -397,7 +397,7 @@ void procConfigureRGBLamps(void)
     }
 }
 
-void procConfigureFlipperSwitchRules(int enabled)
+void procConfigureFlipperSwitchRules_default(int enabled)
 {
 	if (yamlDoc.size() > 0 && yamlDoc[kFlippersSection]) {
 		// WPC Flippers
@@ -439,6 +439,8 @@ void procConfigureFlipperSwitchRules(int enabled)
 		}
 	}
 }
+// Allow for an individual game to override procConfigureFlipperSwitchRules
+void (*procConfigureFlipperSwitchRules)(int enabled) = procConfigureFlipperSwitchRules_default;
 
 /*
 	The procFullTroughDisablesFlippers() function was designed as a way to
