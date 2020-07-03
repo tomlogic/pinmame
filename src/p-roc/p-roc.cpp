@@ -209,7 +209,7 @@ void procCheckQuitMethod(void) {
         exitButton = PRDecode(machineType, numStr.c_str());
         exitButtonHoldTime = procGetYamlPinmameSettingInt("exitButtonHoldTime", 0);
         if (exitButtonHoldTime > 0)
-            printf("\nHold %s (%d) for %dms to quit.\n", exitButtonName.c_str(), exitButton, exitButtonHoldTime);
+            printf("Hold %s (%d) for %dms to quit.\n", exitButtonName.c_str(), exitButton, exitButtonHoldTime);
     }
 }
 
@@ -218,7 +218,7 @@ void procCheckQuitMethod(void) {
 void setPatterDetection(void) {
     autoPatterDetection = (procGetYamlPinmameSettingString("autoPatterDetection", "on") == "on");
     
-    printf("\nAutomatic patter detection : %s\n", autoPatterDetection ? "Enabled" : "Disabled");
+    printf("Automatic patter detection : %s\n", autoPatterDetection ? "Enabled" : "Disabled");
     
 }
 
@@ -239,7 +239,7 @@ void procCheckArduinoRGB(void) {
         isArduino = true;
         strcpy(arduinoPort, port.c_str());
         procConfigureRGBLamps();
-        printf("\nArduino enabled for RGB control on port %s",arduinoPort);
+        printf("Arduino enabled for RGB control on port %s\n", arduinoPort);
     }
 }
 
@@ -269,7 +269,7 @@ void procClearAuxMemory(void) {
 
 // Initialize the P-ROC hardware.
 int procInitialize(char *yaml_filename) {
-	fprintf(stderr, "\n\n****** Initializing P-ROC with %s\n", yaml_filename);
+	fprintf(stderr, "\n****** Initializing P-ROC with %s\n", yaml_filename);
         setMachineType(yaml_filename);
         setPatterDetection();
         
