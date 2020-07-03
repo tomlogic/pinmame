@@ -107,6 +107,10 @@ extern int exitButton;
 // how long to hold a cabinet button (e.g., startButton) to exit PinMAME
 extern int exitButtonHoldTime;
 
+// Handle to proc instance
+extern PRHandle proc;
+extern PRMachineType machineType;
+
 #ifdef __cplusplus
 }
 #endif

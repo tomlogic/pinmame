@@ -1,5 +1,10 @@
 #if defined(PINMAME) && defined(PROC_SUPPORT)
 
+#if _MSC_VER >= 1700 && defined(inline)
+// C++ doesn't allow defining inline as a macro
+#undef inline
+#endif
+
 extern "C" {
 #include "driver.h"
 #include "wpc/core.h"
