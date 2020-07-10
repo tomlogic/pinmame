@@ -230,6 +230,48 @@ static sim_tInportData dm_inportData[] = {
 /*--------------------
   Drawing information
   --------------------*/
+static core_tLampDisplay dm_lampPos = {
+  { 0,  0}, /* top left */
+  {25, 25}, /* size */
+  {
+  /* Lamp 11; Ball Save */
+  {2, {{22, 10, RED}, {22, 14, RED}}},
+  /* Lamps 12 to 15; Fortress/Museum/Cryoprison/Wasteland multiball */
+  {1, {{23, 12, WHITE}}}, {1, {{22, 12, WHITE}}}, {1, {{20, 12, WHITE}}}, {1, {{21, 12, WHITE}}},
+  /* Lamps 16 to 18; Shoot Again, Access Claw, Left Ramp Explode */
+  {1, {{25, 12, ORANGE}}}, {1, {{19, 4, RED}}}, {1, {{14, 12, ORANGE}}},
+
+  /* Column 2 */
+  {1, {{13, 18, RED}}}, {1, {{14, 22, ORANGE}}}, {1, {{19, 22, RED}}}, {1, {{17, 18, LBLUE}}},
+  {1, {{16, 16, ORANGE}}}, {1, {{19, 15, LBLUE}}}, {1, {{19, 9, LBLUE}}}, {1, {{17, 6, LBLUE}}},
+
+  /* Column 3 */
+  {1, {{13, 23, RED}}}, {1, {{12, 22, LBLUE}}}, {1, {{12, 20, RED}}}, {1, {{13, 11, RED}}},
+  {1, {{13, 8, RED}}}, {1, {{13, 5, YELLOW}}}, {1, {{13, 7, LBLUE}}}, {1, {{14, 6, YELLOW}}},
+
+  /* Column 4 */
+  {1, {{14, 18, ORANGE}}}, {1, {{15, 17, ORANGE}}}, {1, {{16, 14, ORANGE}}}, {1, {{15, 13, ORANGE}}},
+  {1, {{16, 11, ORANGE}}}, {1, {{15, 10, ORANGE}}}, {1, {{15, 7, YELLOW}}}, {1, {{14, 9, ORANGE}}},
+
+  /* Column 5 */
+  {1, {{6, 15, RED}}}, {1, {{7, 14, RED}}}, {1, {{7, 12, LBLUE}}}, {1, {{7, 10, RED}}},
+  {1, {{9, 14, RED}}}, {1, {{8, 14, RED}}}, {1, {{7, 7, RED}}}, {1, {{5, 14, RED}}},
+
+  /* Column 6 */
+  {1, {{1, 7, RED}}}, {1, {{3, 7, RED}}}, {1, {{4, 5, RED}}}, {1, {{5, 3, RED}}},
+  {1, {{5, 1, RED}}}, {1, {{1, 19, GREEN}}}, {1, {{1, 21, GREEN}}}, {1, {{1, 23, GREEN}}},
+
+  /* Column 7 */
+  {1, {{10, 21, RED}}}, {1, {{7, 18, YELLOW}}}, {1, {{6, 18, LBLUE}}}, { 0 },
+  { 0 }, {1, {{11, 17, LBLUE}}}, {1, {{10, 16, LBLUE}}}, {1, {{15, 4, WHITE}}},
+
+  /* Column 8; Lamps 81-83 center (ACMAG) ramp */
+  {1, {{2, 14, RED}}}, {2, {{2, 12, RED}, {2, 16, RED}}}, {2, {{2, 13, RED}, {2, 15, RED}}},
+  {1, {{4, 14, RED}}}, {1, {{10, 25, RED}}}, {1, {{25, 20, YELLOW}}}, {1, {{25, 23, RED}}},
+  {1, {{25, 3, YELLOW}}}
+  }
+};
+
   static void dm_drawStatic(BMTYPE **line) {
 
 /* Help */
@@ -364,8 +406,9 @@ static core_tGameData dmGameData = {
   GEN_WPCDCS, wpc_dispDMD,
   {
     FLIP_SW(FLIP_L | FLIP_U) | FLIP_SOL(FLIP_L | FLIP_UL),
-	0,0,8,0,0,0,0,
-	dm_getSol, NULL, NULL, NULL
+    0,0,8,0,0,0,0,
+    dm_getSol, NULL, NULL, NULL,
+    &dm_lampPos
   },
   &dmSimData,
   {
