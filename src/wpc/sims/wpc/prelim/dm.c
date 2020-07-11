@@ -52,39 +52,35 @@ static int dm_getSol(int solNo);
 WPC_INPUT_PORTS_START(dm,5)
 
   PORT_START /* 0 */
-    COREPORT_BIT(0x0001,"Left Qualifier",	KEYCODE_LCONTROL)
-    COREPORT_BIT(0x0002,"Right Qualifier",	KEYCODE_RCONTROL)
-    COREPORT_BIT(0x0004,"",		        KEYCODE_R)
-    COREPORT_BIT(0x0008,"L/R Outlane",		KEYCODE_O)
-    COREPORT_BIT(0x0010,"L/R Slingshot",		KEYCODE_MINUS)
-    COREPORT_BIT(0x0020,"L/R Inlane",		KEYCODE_I)
-    COREPORT_BIT(0x0040,"L/R Jet",		KEYCODE_J)
-    COREPORT_BIT(0x0080,"Top Slingshot",		KEYCODE_MINUS)
-    COREPORT_BIT(0x0100,"",			KEYCODE_T)
-    COREPORT_BIT(0x0200,"",			KEYCODE_Y)
-    COREPORT_BIT(0x0400,"",			KEYCODE_U)
-    COREPORT_BIT(0x0800,"",			KEYCODE_I)
-    COREPORT_BIT(0x1000,"",			KEYCODE_O)
-    COREPORT_BIT(0x2000,"",			KEYCODE_A)
-    COREPORT_BIT(0x4000,"",			KEYCODE_S)
-    COREPORT_BIT(0x8000,"Drain",			KEYCODE_Q)
+    COREPORT_BIT(   0x0001,"Left Qualifier",  KEYCODE_LCONTROL)
+    COREPORT_BIT(   0x0002,"Right Qualifier", KEYCODE_RCONTROL)
+    COREPORT_BITIMP(0x0004,"L/R Ramp",        KEYCODE_R)
+    COREPORT_BITIMP(0x0008,"L/R Outlane",     KEYCODE_O)
+    COREPORT_BITIMP(0x0010,"L/R Loop",        KEYCODE_L)
+    COREPORT_BIT(   0x0040,"L/R Slingshot",   KEYCODE_MINUS)
+    COREPORT_BIT(   0x0080,"L/R Inlane",      KEYCODE_I)
+
+    COREPORT_BITIMP(0x0100,"Standup 1",       KEYCODE_Z)
+    COREPORT_BITIMP(0x0200,"Standup 2",       KEYCODE_X)
+    COREPORT_BITIMP(0x0400,"Standup 3",       KEYCODE_C)
+    COREPORT_BITIMP(0x0800,"Standup 4",       KEYCODE_V)
+    COREPORT_BITIMP(0x1000,"Standup 5",       KEYCODE_B)
+    COREPORT_BITIMP(0x2000,"Jet 1",           KEYCODE_J)
+    COREPORT_BITIMP(0x4000,"Jet 2",           KEYCODE_K)
+    COREPORT_BITIMP(0x8000,"Jet 3",           KEYCODE_L)
 
   PORT_START /* 1 */
-    COREPORT_BIT(0x0001,"",			KEYCODE_D)
-    COREPORT_BIT(0x0002,"",			KEYCODE_F)
-    COREPORT_BIT(0x0004,"",			KEYCODE_G)
-    COREPORT_BIT(0x0008,"",			KEYCODE_H)
-    COREPORT_BIT(0x0010,"",			KEYCODE_J)
-    COREPORT_BIT(0x0020,"",			KEYCODE_K)
-    COREPORT_BIT(0x0040,"",			KEYCODE_L)
-    COREPORT_BIT(0x0080,"",			KEYCODE_Z)
-    COREPORT_BIT(0x0100,"",			KEYCODE_X)
-    COREPORT_BIT(0x0200,"",			KEYCODE_C)
-    COREPORT_BIT(0x0400,"",			KEYCODE_V)
-    COREPORT_BIT(0x0800,"",			KEYCODE_B)
-    COREPORT_BIT(0x1000,"",			KEYCODE_N)
-    COREPORT_BIT(0x2000,"",			KEYCODE_M)
-    COREPORT_BIT(0x4000,"",			KEYCODE_COMMA)
+    COREPORT_BIT(   0x0001,"Eyeball",         KEYCODE_E)
+    COREPORT_BIT(   0x0002,"Retina Eject",    KEYCODE_R)
+    COREPORT_BIT(   0x0004,"Car Crash",       KEYCODE_T)
+    COREPORT_BIT(   0x0008,"Center Ramp",     KEYCODE_Y)
+    COREPORT_BIT(   0x0010,"Underground",     KEYCODE_H)
+    COREPORT_BIT(   0x0020,"Side Ramp",       KEYCODE_N)
+
+    COREPORT_BIT(   0x1000,"M Lane",          KEYCODE_M)
+    COREPORT_BIT(   0x2000,"T Lane",          KEYCODE_COMMA)
+    COREPORT_BIT(   0x4000,"L Lane",          KEYCODE_STOP)
+    COREPORT_BITIMP(0x8000,"Drain",           KEYCODE_Q)
 
 WPC_INPUT_PORTS_END
 
@@ -92,84 +88,179 @@ WPC_INPUT_PORTS_END
 / Switch definitions
 /--------------------*/
 /* Standard Switches */
-#define swStart      	13
-#define swTilt       	14
-#define swSlamTilt	21
-#define swCoinDoor	22
-#define swTicket     	23
+#define swLaunch        11
+#define swLeftHandle    12
+#define swStart         13
+#define swTilt          14
+#define swLeftOutlane   15
+#define swLeftInlane    16
+#define swRightInlane   17
+#define swRightOutlane  18
 
-/* Other switches */
-#define swLaunch	11
-#define swLeftOutlane	15
-#define swLeftInlane	16
-#define swRightInlane	17
-#define swRightOutlane	18
-#define swShooter	27
-#define swTrough1	31
-#define swTrough2	32
-#define swTrough3	33
-#define swTrough4	34
-#define swTrough5	35
-#define swTroughJam	36
-#define swLeftSling	41
-#define swRightSling	42
-#define swLeftJet	43
-#define swTopSling	44
-#define swRightJet	45
+#define swSlamTilt      21
+#define swCoinDoor      22
+#define swTicket        23
+#define swAlwaysClosed  24
+#define swClawPosition1 25  /* Opto */
+#define swClawPosition2 26  /* Opto */
+#define swShooter       27
+/* Switch 28 not used */
+
+#define swTrough1       31  /* Opto */
+#define swTrough2       32  /* Opto */
+#define swTrough3       33  /* Opto */
+#define swTrough4       34  /* Opto */
+#define swTrough5       35  /* Opto */
+#define swTroughJam     36  /* Opto */
+/* Switch 37 not used */
+#define swStandup5      38
+
+#define swLeftSling     41
+#define swRightSling    42
+#define swLeftJet       43
+#define swTopSling      44
+#define swRightJet      45
+#define swRRampEnter    46
+#define swRRampExit     47
+#define swLoopRight     48
+
+#define swLRampEnter    51
+#define swLRampExit     52
+#define swCenterRamp    53
+#define swUpperRebound  54  /* WTF is this switch? */
+#define swLoopCenter    55  /* in manual as Left Loop */
+#define swStandup2      56
+#define swStandup3      57
+#define swStandup4      58
+
+#define swSRampEnter    61
+#define swSRampExit     62
+#define swRolloverM     63
+#define swRolloverT     64
+#define swRolloverL     65
+#define swRetinaEject   66
+#define swElevatorIndex 67  /* Opto */
+/* Switch 68 not used */
+
+#define swCarChase1     71  /* Opto */
+#define swCarChase2     72  /* Opto */
+#define swTopPopper     73  /* Opto */
+#define swElevatorHold  74  /* Opto */
+#define swElevatorRamp  75
+#define swBottomPopper  76  /* Opto */
+#define swEyeball       77
+#define swStandup1      78
+
+#define swClawSimon     81
+#define swClawJets      82
+#define swClawPrison    83
+#define swClawFreeze    84
+#define swClawAcmag     85
+#define swLoopLeft      86
+#define swCarChase3     87
+#define swLowerRebound  88
 
 /*---------------------
 / Solenoid definitions
 /----------------------*/
-#define sTrough		1
-#define sLaunch		3
-#define sKnocker	7
-#define sLeftSling	9
-#define sRightSling	10
-#define sLeftJet	11
-#define sTopSling	12
-#define sRightJet	13
+#define sTrough         1
+#define sBottomPopper   2
+#define sLaunch         3
+#define sTopPopper      4
+#define sDiverterPower  5
+#define sKnocker        7
+#define sLeftSling      9
+#define sRightSling     10
+#define sLeftJet        11
+#define sTopSling       12
+#define sRightJet       13
+#define sRetinaEject    14
+#define sDiverterHold   15
+#define sElevatorMotor  18
+#define sClawLeft       19
+#define sClawRight      20
+#define sClawMagnet     33
 
 /*---------------------
 /  Ball state handling
 /----------------------*/
-enum {stTrough5=SIM_FIRSTSTATE, stTrough4, stTrough3, stTrough2, stTrough1, stTrough, stDrain,
-      stShooter, stBallLane, stRightOutlane, stLeftOutlane, stRightInlane, stLeftInlane, stLeftSling, stRightSling, stLeftJet, stTopSling, stRightJet
-	  };
+enum {
+  stTrough5=SIM_FIRSTSTATE, stTrough4, stTrough3, stTrough2, stTrough1, stTrough, stShooter, stDrain,
+  stBallLane, stRightOutlane, stLeftOutlane, stRightInlane, stLeftInlane,
+  stLeftSling, stRightSling, stLeftJet, stTopSling, stRightJet, stBumpers, stBumpers2, stBumpers3,
+  stRolloverM, stRolloverT, stRolloverL, stCarCrash, stCarCrash2, stCarCrash3,
+  stLLoopUp, stLLoopDn, stCLoopRight, stCLoopLeft, stRLoopUp, stRLoopDn,
+  stTopPopper, stBottomPopper, stEyeball, stRetinaEject,
+  stLRampEnter, stLRampExit, stCRamp, stSRampEnter, stSRampExit, stRRampEnter, stRRampExit,
+};
 
 static sim_tState dm_stateDef[] = {
-  {"Not Installed",	0,0,		 0,		stDrain,	0,	0,	0,	SIM_STNOTEXCL},
+  {"Not Installed", 0, 0,               0,              stDrain,        0, 0, 0, SIM_STNOTEXCL},
   {"Moving"},
-  {"Playfield",		0,0,		 0,		0,		0,	0,	0,	SIM_STNOTEXCL},
+  {"Playfield",     0, 0,               0,              0,              0, 0, 0, SIM_STNOTEXCL},
 
-  /*Line 1*/
-  {"Trough 5",		1,swTrough5,	0,		stTrough4,	1},
-  {"Trough 4",		1,swTrough4,	0,		stTrough3,	1},
-  {"Trough 3",		1,swTrough3,	0,		stTrough2,	1},
-  {"Trough 2",		1,swTrough2,	0,		stTrough1,	1},
-  {"Trough 1",		1,swTrough1,	sTrough,	stTrough,	1},
-  {"Trough Jam",	1,swTroughJam,  0,		stShooter,	1},
-  {"Drain",		1,0,		0,		stTrough5,	0,	0,	0,	SIM_STNOTEXCL},
+  /* Line 1 */
+  {"Trough 5",      1, swTrough5,       0,              stTrough4,      1},
+  {"Trough 4",      1, swTrough4,       0,              stTrough3,      1},
+  {"Trough 3",      1, swTrough3,       0,              stTrough2,      1},
+  {"Trough 2",      1, swTrough2,       0,              stTrough1,      1},
+  {"Trough 1",      1, swTrough1,       sTrough,        stTrough,       1},
+  {"Trough Jam",    1, swTroughJam,     0,              stShooter,      1},
+  {"Shooter",       1, swShooter,       sLaunch,        stBallLane,     0, 0, 0, SIM_STNOTEXCL | SIM_STSHOOT},
+  {"Drain",         1, 0,               0,              stTrough5,      0, 0, 0, SIM_STNOTEXCL},
 
-  /*Line 2*/
-  {"Shooter",		1,swShooter,	 sLaunch,	stBallLane,	0,	0,	0,	SIM_STNOTEXCL|SIM_STSHOOT},
-  {"Ball Lane",		1,0,		 0,		stFree,		7,	0,	0,	SIM_STNOTEXCL},
-  {"Right Outlane",	1,swRightOutlane,0,		stDrain,	15},
-  {"Left Outlane",	1,swLeftOutlane, 0,		stDrain,	15},
-  {"Right Inlane",	1,swRightInlane, 0,		stFree,		5},
-  {"Left Inlane",	1,swLeftInlane,	 0,		stFree,		5},
-  {"Left Slingshot",	1,swLeftSling,	 0,		stFree,		1},
-  {"Rt Slingshot",	1,swRightSling,	 0,		stFree,		1},
-  {"Left Bumper",	1,swLeftJet,	 0,		stFree,		1},
-  {"Top Slingshot",	1,swTopSling,	 0,		stFree,		1},
-  {"Right Bumper",	1,swRightJet,	 0,		stFree,		1},
+  /* Line 2 */
+  /* auto-plunge feeds to upper-left flipper via right loop */
+  {"Ball Lane",     1, 0,               0,              stRLoopUp,      7, 0, 0, SIM_STNOTEXCL},
+  {"Right Outlane", 1, swRightOutlane,  0,              stDrain,        15},
+  {"Left Outlane",  1, swLeftOutlane,   0,              stDrain,        15},
+  {"Right Inlane",  1, swRightInlane,   0,              stFree,         5},
+  {"Left Inlane",   1, swLeftInlane,    0,              stFree,         5},
 
-  /*Line 3*/
+  /* Line 3 */
+  {"Left Sling",    1, swLeftSling,     0,              stFree,         1},
+  {"Right Sling",   1, swRightSling,    0,              stFree,         1},
+  {"Left Bumper",   1, swLeftJet,       0,              stFree,         1},
+  {"Top Sling",     1, swTopSling,      0,              stFree,         1},
+  {"Right Bumper",  1, swRightJet,      0,              stFree,         1},
+  /* TODO: randomize bumper action? */
+  {"Bumpers",       1, swLeftJet,       0,              stBumpers2,     1},
+  {"Bumpers",       1, swRightJet,      0,              stBumpers3,     1},
+  {"Bumpers",       1, swTopSling,      0,              stFree,         1},
 
-  /*Line 4*/
+  /* Line 4 */
+  {"M-t-l",         1, swRolloverM,     0,              stBumpers,      1},
+  {"m-T-l",         1, swRolloverT,     0,              stBumpers,      1},
+  {"m-t-L",         1, swRolloverL,     0,              stBumpers,      1},
+  {"Car Crash 1",   1, swCarChase1,     0,              stCarCrash2,    2},
+  {"Car Crash 2",   1, swCarChase2,     0,              stCarCrash3,    2},
+  {"Car Crash 3",   1, swCarChase3,     0,              stFree,         1},
 
-  /*Line 5*/
+  /* Line 5: loops */
+  {"L. Loop Enter", 1, swLoopLeft,      0,              stCLoopRight,   5},
+  {"L. Loop Exit",  1, swLoopLeft,      0,              stFree,         1},
+  {"Looping Right", 1, swLoopCenter,    0,              stTopPopper,    5},
+  {"Looping Left",  1, swLoopCenter,    0,              stLLoopDn,      5},
+  {"R. Loop Enter", 1, swLoopRight,     0,              stCLoopLeft,    5},
+  {"R. Loop Exit",  1, swLoopRight,     0,              stFree,         1},
 
-  /*Line 6*/
+  /* Line 6 */
+  /* TODO: Top Popper should go to any lane (stRollover{M,T,L}) or stRLoopDn */
+  {"Top Popper",    1, swTopPopper,     sTopPopper,     stRolloverT,    1},
+  {"Bottom Popper", 1, swBottomPopper,  sBottomPopper,  stRightInlane,  1},
+  {"Eyeball",       1, swEyeball,       0,              stRetinaEject,  3},
+  {"Retina Eject",  1, swRetinaEject,   sRetinaEject,   stLeftInlane,   1},
+
+  /* Line 7 */
+  {"L. Ramp Enter",   1, swLRampEnter,  0,              stLRampExit,    5},
+  {"L. Ramp Exit",    1, swLRampExit,   0,              stLeftInlane,   5},
+  /* TODO: Center Ramp should randomly do stTopPopper (15%), stCLoopLeft (15%) or stRolloverM (70%) */
+  {"Center Ramp",     1, swCenterRamp,  0,              stRolloverM,    5},
+  {"Side Ramp Enter", 1, swSRampEnter,  0,              stSRampExit,    5},
+  {"Side Ramp Exit",  1, swSRampExit,   0,              stRetinaEject,  5},
+  /* once claw emulated, update R. Ramp to reference sDiverterHold */
+  {"R. Ramp Enter",   1, swRRampEnter,  0,              stRRampExit,    5},
+  {"R. Ramp Exit",    1, swRRampExit,   0,              stRightInlane,  5},
 
   {0}
 };
@@ -178,52 +269,51 @@ static int dm_handleBallState(sim_tBallStatus *ball, int *inports) {
   switch (ball->state)
 	{
 	}
-    return 0;
-  }
+  return 0;
+}
 
 /*---------------------------
 /  Keyboard conversion table
 /----------------------------*/
 
 static sim_tInportData dm_inportData[] = {
-
 /* Port 0 */
-//  {0, 0x0005, st},
-//  {0, 0x0006, st},
+  {0, 0x0005, stLRampEnter},
+  {0, 0x0006, stRRampEnter},
   {0, 0x0009, stLeftOutlane},
   {0, 0x000a, stRightOutlane},
-  {0, 0x0011, stLeftSling},
-  {0, 0x0012, stRightSling},
-  {0, 0x0021, stLeftInlane},
-  {0, 0x0022, stRightInlane},
-  {0, 0x0041, stLeftJet},
-  {0, 0x0042, stRightJet},
-  {0, 0x0080, stTopSling},
-//  {0, 0x0100, st},
-//  {0, 0x0200, st},
-//  {0, 0x0400, st},
-//  {0, 0x0800, st},
-//  {0, 0x1000, st},
-//  {0, 0x2000, st},
-//  {0, 0x4000, st},
-  {0, 0x8000, stDrain},
+  {0, 0x0011, stLLoopUp},
+  {0, 0x0012, stRLoopUp},
+  {0, 0x0041, swLeftSling},
+  {0, 0x0042, swRightSling},
+  {0, 0x0081, stLeftInlane},
+  {0, 0x0082, stRightInlane},
+  {0, 0x0100, swStandup1},
+  {0, 0x0200, swStandup2},
+  {0, 0x0400, swStandup3},
+  {0, 0x0800, swStandup4},
+  {0, 0x1000, swStandup5},
+  {0, 0x2000, swLeftJet},
+  {0, 0x4000, swRightJet},
+  {0, 0x8000, swTopSling},
 
 /* Port 1 */
-//  {1, 0x0001, st},
-//  {1, 0x0002, st},
-//  {1, 0x0004, st},
-//  {1, 0x0008, st},
-//  {1, 0x0010, st},
-//  {1, 0x0020, st},
+  {1, 0x0001, stEyeball},
+  {1, 0x0002, stRetinaEject},
+  {1, 0x0004, stCarCrash},
+  {1, 0x0008, stCRamp},
+  {1, 0x0010, stBottomPopper},  /* Computer/Underground */
+  {1, 0x0020, stSRampEnter},
 //  {1, 0x0040, st},
 //  {1, 0x0080, st},
 //  {1, 0x0100, st},
 //  {1, 0x0200, st},
 //  {1, 0x0400, st},
 //  {1, 0x0800, st},
-//  {1, 0x1000, st},
-//  {1, 0x2000, st},
-//  {1, 0x4000, st},
+  {1, 0x1000, stRolloverM},
+  {1, 0x2000, stRolloverT},
+  {1, 0x4000, stRolloverL},
+  {1, 0x8000, stDrain},
   {0}
 };
 
@@ -272,22 +362,19 @@ static core_tLampDisplay dm_lampPos = {
   }
 };
 
-  static void dm_drawStatic(BMTYPE **line) {
-
-/* Help */
-
-  core_textOutf(30, 60,BLACK,"Help on this Simulator:");
-  core_textOutf(30, 70,BLACK,"L/R Ctrl+J = L/R Jet Bumper");
-  core_textOutf(30, 80,BLACK,"L/R Ctrl+- = L/R/Top Slingshot");
-  core_textOutf(30, 90,BLACK,"L/R Ctrl+I/O = L/R Inlane/Outlane");
-  core_textOutf(30,100,BLACK,"Q = Drain Ball");
-  core_textOutf(30,110,BLACK,"");
-  core_textOutf(30,120,BLACK,"");
-  core_textOutf(30,130,BLACK,"      *** PRELIMINARY ***");
-  core_textOutf(30,140,BLACK,"");
-  core_textOutf(30,150,BLACK,"");
-  core_textOutf(30,160,BLACK,"");
-  }
+static void dm_drawStatic(BMTYPE **line) {
+  /* Help */
+  core_textOutf(30, 60, BLACK, "Help on this Simulator:");
+  core_textOutf(30, 70, BLACK, "L/R Ctrl+I/O = L/R Inlane/Outlane");
+  core_textOutf(30, 80, BLACK, "L/R Ctrl+- = L/R Slingshot");
+  core_textOutf(30, 90, BLACK, "L/R Ctrl+R = L/R Ramp Shot");
+  core_textOutf(30, 100, BLACK, "L/R Ctrl+L = L/R Loop");
+  core_textOutf(30, 110, BLACK, "Q = Drain Ball  H = Underground");
+  core_textOutf(30, 120, BLACK, "Y/N = Center Ramp/Side Ramp");
+  core_textOutf( 0, 130, BLACK, "E/R/T = Eyeball/Retina Eject/Car Crash");
+  core_textOutf( 0, 140, BLACK, "J/K/L = Jet Bumpers  M/,/. = MTL Lanes");
+  core_textOutf( 0, 150, BLACK, "Z/X/C/V/B = Freeze Standups");
+}
 
 /*-----------------
 /  ROM definitions
