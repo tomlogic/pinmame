@@ -535,8 +535,146 @@ CORE_CLONEDEF(dm,h6c,  lx4, "Demolition Man (H-6C Competition MOD)",2019,"Willia
 CORE_CLONEDEF(dm,dt099,lx4, "Demolition Man (FreeWPC/Demolition Time 0.99)", 2014,"FreeWPC",wpc_mDCSS,0)
 CORE_CLONEDEF(dm,dt101,lx4, "Demolition Man (FreeWPC/Demolition Time 1.01)", 2014,"FreeWPC",wpc_mDCSS,0)
 
+#define MAX_SCORE_BYTES   6
+#define MAX_PLAYER_COUNT  6
+typedef struct {
+  const int *score_offsets;     // offsets into wpc_ram[] for BCD-encoded score
+  int byte_count;               // number of bytes per score
+  int player_count;             // number of players in game, 0 if no game in progress
+  int ball_count;               // number of balls, 0 if unknown
+  int cur_player;               // current player, 0 if unknown
+  int cur_ball;                 // current ball, 0 if unknown
+} wpc_scores_t;
+
+void wpc_drawScores(const wpc_scores_t *ws, int x, int y) {
+  static UINT8 score_cache[MAX_SCORE_BYTES * MAX_PLAYER_COUNT];
+  static int last_player_count = 0;
+
+  // special call to initialize score_cache to invalid (and non-zero) data
+  if (ws == NULL) {
+    memset(score_cache, 0xFF, sizeof score_cache);
+    return;
+  }
+
+  if (ws->byte_count <= MAX_SCORE_BYTES && ws->player_count <= MAX_PLAYER_COUNT) {
+    char buffer[MAX_SCORE_BYTES * 3];
+    int player;
+
+    for (player = 0; player < ws->player_count; player++) {
+      int offset = player * ws->byte_count;
+      int nvram_offset = ws->score_offsets[player];
+      if (memcmp(&score_cache[offset], &wpc_ram[nvram_offset], ws->byte_count) != 0)
+      {
+        // score for <player> has changed
+        memcpy(&score_cache[offset], &wpc_ram[nvram_offset], ws->byte_count);
+
+        // convert BCD score to string
+        char *p = buffer;
+        for (int i = 0; i < ws->byte_count; i++) {
+          UINT8 byte = score_cache[offset++];
+          int comma = (ws->byte_count - i) % 3;
+          if (i && comma == 0)
+            *p++ = ',';
+          *p++ = "0123456789ABCDEF"[byte >> 4];
+          if (comma == 2)
+            *p++ = ',';
+          *p++ = "0123456789ABCDEF"[byte & 0x0F];
+        }
+        *p = '\0';    // add null terminator
+
+        // replace leading zeros/commas with spaces, except last two (show 00)
+        for (int i = 0; strchr("0,", buffer[i]) && buffer[i + 2] != '\0'; i++) {
+          buffer[i] = ' ';
+        }
+
+        // Show score with player # and indicator for current player (<)
+        core_textOutf(x, y + player * 10, BLACK, "%s%cP%u", buffer,
+                      player + 1 == ws->cur_player ? '<' : '[',
+                      player + 1);
+      }
+    }
+
+    if (player < last_player_count) {
+      memset(buffer, ' ', sizeof buffer);
+      buffer[sizeof buffer - 1] = '\0';
+      while (player < last_player_count) {
+        // clear lines with old scores
+        core_textOutf(x, y + player * 10, BLACK, "%s   ", buffer);
+        player++;
+      }
+    }
+    last_player_count = ws->player_count;
+  }
+}
+
+// Routine to show real-time scores during game.
+// Score offsets from https://github.com/tomlogic/pinmame-nvram-maps
+
+typedef struct {
+  int scores[4];
+  int score_bytes;
+  int cur_player;
+  int cur_ball;
+  int player_count;
+  int ball_count;
+} game_state_offsets_t;
+
+const game_state_offsets_t dm_lx4_state = {
+  { 0x1730, 0x1737, 0x173E, 0x1745 },
+  6,  // 6 bytes per score entry
+  0x0418, // cur_player
+  0x0419, // cur_ball
+  0x17A9, // player_count
+  0x1B20, // ball_count
+};
+
+const int dm_lx4_scores[] = { 0x1730, 0x1737, 0x173E, 0x1745 };
+const int dm_h6_scores[] = { 0x16A0, 0x16A7, 0x16AE, 0x16B5 };
+const int dm_dt101_scores[] = { 0x1607, 0x160C, 0x1611, 0x1616 };
+#define INIT_SCORES  (const void *)-1
 
 static void dm_drawMech(BMTYPE** line) {
+  static wpc_scores_t score_conf = {
+    NULL
+  };
+
+  // configure real-time score reporting
+  if (score_conf.byte_count == 0) {
+    game_state_offsets_t *state_offsets = NULL;
+    wpc_drawScores(NULL, 0, 0);     // initialize score cache
+    if (Machine->gamedrv == &driver_dm_lx4
+        || Machine->gamedrv == &driver_dm_dx4
+        || Machine->gamedrv == &driver_dm_lx4c)
+    {
+      state_offsets = &dm_lx4_state;
+    }
+    /*
+    else if (Machine->gamedrv == &driver_dm_h6
+             || Machine->gamedrv == &driver_dm_h6c)
+    {
+      score_conf.nvram_offsets = dm_h6_scores;
+      score_conf.byte_count = 6;
+    }
+    else if (Machine->gamedrv == &driver_dm_dt101)
+    {
+      score_conf.nvram_offsets = dm_dt101_scores;
+      score_conf.byte_count = 5;
+    }
+    */
+    if (state_offsets != NULL) {
+      score_conf.byte_count = state_offsets->score_bytes;
+      score_conf.score_offsets = state_offsets->scores;
+    }
+  }
+
+  if (score_conf.score_offsets != NULL) {
+    score_conf.ball_count = 0;
+    score_conf.player_count = 4;
+    score_conf.cur_ball = 0;
+    score_conf.cur_player = 0;
+    wpc_drawScores(&score_conf, 30, 20);
+  }
+
   if (coreGlobals.simAvail) {
     // Claw position, 'M' if magnet enabled, description of position, '*' if
     // right ramp diverter feeding claw.
